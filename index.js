@@ -13,6 +13,7 @@ module.exports = {
     Activation: require('./lib/Activation'),
     GroupState: require('./lib/GroupState'),
     Notice: require('./lib/Notice'),
+    Prompt: require('./lib/Prompt'),
     Queue: require('./lib/Queue'),
     Submittable: require('./lib/Submittable'),
     Toggleable: require('./lib/Toggleable'),
