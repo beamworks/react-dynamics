@@ -4,8 +4,6 @@ module.exports = {
     Movable: require('./lib/Movable'),
     Pressable: require('./lib/Pressable'),
 
-    Linkable: require('./lib/Linkable'),
-
     Expirable: require('./lib/Expirable'),
     Fadeable: require('./lib/Fadeable'),
     Holdable: require('./lib/Holdable'),
