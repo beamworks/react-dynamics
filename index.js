@@ -4,9 +4,7 @@ module.exports = {
     Movable: require('./lib/Movable'),
     Pressable: require('./lib/Pressable'),
 
-    Expirable: require('./lib/Expirable'),
-    Fadeable: require('./lib/Fadeable'),
-    Holdable: require('./lib/Holdable'),
+    Timeout: require('./lib/Timeout'),
 
     Prompt: require('./lib/Prompt')
 };
