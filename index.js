@@ -16,6 +16,5 @@ module.exports = {
     Prompt: require('./lib/Prompt'),
     Queue: require('./lib/Queue'),
     Submittable: require('./lib/Submittable'),
-    Toggleable: require('./lib/Toggleable'),
     Triggerable: require('./lib/Triggerable')
 };
