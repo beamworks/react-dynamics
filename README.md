@@ -21,5 +21,6 @@ Core areas:
     - `Movable`: track mouse and touch movement for gestures and dragging
     - `Pressable`: track mouse click and touch status for gestures and dragging
 - abstract interaction state
+    - `Data`: request data on demand and asynchronously wait for result
     - `Prompt`: status tracker triggered by a function call, trackable as a promise
     - `Timeout`: basic timeout state triggered via prop
