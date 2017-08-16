@@ -6,5 +6,6 @@ module.exports = {
 
     Timeout: require('./lib/Timeout'),
 
+    Data: require('./lib/Data'),
     Prompt: require('./lib/Prompt')
 };
