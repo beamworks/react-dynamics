@@ -22,5 +22,32 @@ Core areas:
     - `Pressable`: track mouse click and touch status for gestures and dragging
 - abstract interaction state
     - `Data`: request data on demand and asynchronously wait for result
+    - `Op`: trigger long-running action and report its results to the user
     - `Prompt`: status tracker triggered by a function call, trackable as a promise
     - `Timeout`: basic timeout state triggered via prop
+
+## Op Usage
+
+Simple usage example of the `Op` component:
+
+```
+<Op
+    action={() => doSomethingReturningPromise()}
+    then={result => doSomethingElseUnlessAlreadyUnmounted(result)}
+>
+    {(currentOp, lastOp) =>
+        <form onSubmit={() => currentOp.invoke()} action="javascript:void(0)">
+            {lastOp && lastOp.isError
+                ? <var>Please try again! Error: {lastOp.value}</var>
+                : null
+            }
+
+            {currentOp.isPending ? <Spinner/> : null}
+
+            ... input elements, etc ...
+
+            <button type="submit" disabled={currentOp.isPending}>Submit</button>
+        </form>
+    }
+</Op>
+```
