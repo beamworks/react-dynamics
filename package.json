@@ -1,6 +1,6 @@
 {
   "name": "react-dynamics",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "User interaction building blocks for React",
   "main": "index.js",
   "scripts": {
