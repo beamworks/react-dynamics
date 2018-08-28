@@ -8,5 +8,5 @@ module.exports = {
 
     Data: require('./lib/Data'),
     Op: require('./lib/Op'),
-    Task: require('./lib/Prompt')
+    Task: require('./lib/Task')
 };
