@@ -18,7 +18,6 @@ Core areas:
 - DOM interaction affordances
     - `Focusable`: track DOM focus state for an element and all of its children
     - `Hoverable`: track DOM mouse hover status
-    - `Movable`: track mouse and touch movement for gestures and dragging
     - `Pressable`: track mouse click and touch status for gestures and dragging
 - abstract interaction state
     - `Data`: request data on demand and asynchronously wait for result
