@@ -8,5 +8,6 @@ module.exports = {
 
     Data: require('./lib/Data'),
     Op: require('./lib/Op'),
-    Task: require('./lib/Task')
+    Task: require('./lib/Task'),
+    Sequence: require('./lib/Sequence')
 };
