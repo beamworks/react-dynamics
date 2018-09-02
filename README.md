@@ -23,7 +23,7 @@ Core areas:
 - abstract interaction state
     - `Data`: request data on demand and asynchronously wait for result
     - `Op`: trigger long-running action and report its results to the user
-    - `Prompt`: status tracker triggered by a function call, trackable as a promise
+    - `Task`: status tracker started and stopped via user events (for e.g. dropdowns, popups)
     - `Timeout`: basic timeout state triggered via prop
 
 ## Op Usage
