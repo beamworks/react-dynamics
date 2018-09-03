@@ -1,6 +1,4 @@
 module.exports = {
-    Focusable: require('./lib/Focusable'),
-    Hoverable: require('./lib/Hoverable'),
     Pressable: require('./lib/Pressable'),
 
     Timeout: require('./lib/Timeout'),
