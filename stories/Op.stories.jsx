@@ -25,8 +25,8 @@ storiesOf('Op', module)
             }
 
             return <div>
-                <button type="button" onClick={() => currentOp.invoke('TEST1')}>
-                    Invoke with: TEST1
+                <button type="button" onClick={() => currentOp.invoke('TEST' + currentOp.key)}>
+                    Invoke with: TEST{currentOp.key}
                 </button>
             </div>;
         }}</Op>;
