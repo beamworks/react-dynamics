@@ -4,8 +4,8 @@ import { action } from '@storybook/addon-actions';
 
 import Timeout from '!babel-loader!../lib/Timeout';
 
-storiesOf('react-dynamics', module)
-    .add('Timeout', () => {
+storiesOf('Timeout', module)
+    .add('basic usage', () => {
         const reportOuterRender = action('render parent');
         const reportRender = action('render with timeout state');
         const reportFinish = action('timeout then-prop call');
@@ -25,7 +25,7 @@ storiesOf('react-dynamics', module)
             }}</Timeout>
         </div>;
     })
-    .add('Timeout with mid-way reset', () => {
+    .add('with mid-way reset', () => {
         const reportOuterRender = action('render parent');
         const reportRender = action('render with timeout state');
         const reportFinish = action('timeout then-prop call');
