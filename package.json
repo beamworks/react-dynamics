@@ -4,7 +4,7 @@
   "description": "User interaction building blocks for React",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"No test specified\""
+    "storybook": "start-storybook -p 9001 -c .storybook"
   },
   "author": "Nick Matantsev <nick.matantsev@gmail.com>",
   "repository": {
@@ -16,6 +16,11 @@
   ],
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "@storybook/react": "^4.0.0-rc.1",
+    "babel-loader": "^8.0.4",
     "react": "^16.2.0",
     "react-dom": "^16.2.0"
   },
