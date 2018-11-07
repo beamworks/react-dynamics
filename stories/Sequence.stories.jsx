@@ -48,7 +48,7 @@ storiesOf('Sequence', module)
         const reportStepAnswer = action('resulting answer');
 
         return <MemoryRouter><Route>{({ location: refreshLocation }) => <Op action={v => v}>{(currentOp, lastOp) => <Sequence
-            step={(prompt, next) => {
+            step={(prompt, next, prevStepActive) => {
                 if (!next) {
                     // @todo move this down? if it is meant to support paths
                     return <div>Finish {prompt}</div>;
@@ -56,14 +56,14 @@ storiesOf('Sequence', module)
 
                 const [ stepKey, stepContents ] = prompt;
 
-                return <Route refreshLocation={refreshLocation} path={`/${stepKey}`}>{({ match, location, history }) => {
+                return <Route refreshLocation={refreshLocation} exact path={`/${stepKey}`}>{({ match, location, history }) => {
                     const allValues = lastOp && !lastOp.isError && lastOp.value || {};
 
                     const stepHasValue = Object.prototype.hasOwnProperty.call(allValues, stepKey);
                     const stepValue = allValues[stepKey];
 
                     if (match) {
-                        return <div>
+                        return <Task>{(redirectState, startRedirect) => redirectState && stepHasValue ? next(stepValue, true) : <div>
                             Step {stepContents} [
                             {stepHasValue ? stepValue : '<empty>'}
                             ] | <button
@@ -75,8 +75,16 @@ storiesOf('Sequence', module)
                                     };
 
                                     currentOp.invoke(updatedAllValues);
+                                    startRedirect();
                                 }}
                             >NEXT</button>
+                        </div>}</Task>;
+                    } else if (prevStepActive) {
+                        return <div>
+                            should redirect to /{stepKey}... <button
+                                type="button"
+                                onClick={() => history.push(`/${stepKey}`)}
+                            >Go</button>
                         </div>;
                     }
 
@@ -88,7 +96,7 @@ storiesOf('Sequence', module)
                         >Go to start, nothing on /{stepKey}</button>;
                     }
 
-                    return next(stepValue);
+                    return next(stepValue, false);
                 }}</Route>;
             }}
         >{function* () {
