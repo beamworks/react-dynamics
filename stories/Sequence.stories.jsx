@@ -47,7 +47,7 @@ storiesOf('Sequence', module)
         const reportStepYield = action('yielding on step');
         const reportStepAnswer = action('resulting answer');
 
-        return <MemoryRouter><Op action={v => v}>{(currentOp, lastOp) => <Sequence
+        return <MemoryRouter><Route>{({ location: refreshLocation }) => <Op action={v => v}>{(currentOp, lastOp) => <Sequence
             step={(prompt, next) => {
                 if (!next) {
                     return <div>Finish {prompt}</div>;
@@ -55,7 +55,7 @@ storiesOf('Sequence', module)
 
                 const [ stepKey, stepContents ] = prompt;
 
-                return <Route path={`/${stepKey}`}>{({ match, location, history }) => {
+                return <Route refreshLocation={refreshLocation} path={`/${stepKey}`}>{({ match, location, history }) => {
                     const allValues = lastOp && !lastOp.isError && lastOp.value || {};
                     const stepValue = allValues[stepKey];
 
@@ -88,5 +88,5 @@ storiesOf('Sequence', module)
 
             reportStepYield(step);
             return `FINAL STEP ${step}`;
-        }}</Sequence>}</Op></MemoryRouter>;
+        }}</Sequence>}</Op>}</Route></MemoryRouter>;
     });
