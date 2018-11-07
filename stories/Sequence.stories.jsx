@@ -50,6 +50,7 @@ storiesOf('Sequence', module)
         return <MemoryRouter><Route>{({ location: refreshLocation }) => <Op action={v => v}>{(currentOp, lastOp) => <Sequence
             step={(prompt, next) => {
                 if (!next) {
+                    // @todo move this down? if it is meant to support paths
                     return <div>Finish {prompt}</div>;
                 }
 
@@ -57,31 +58,48 @@ storiesOf('Sequence', module)
 
                 return <Route refreshLocation={refreshLocation} path={`/${stepKey}`}>{({ match, location, history }) => {
                     const allValues = lastOp && !lastOp.isError && lastOp.value || {};
+
+                    const stepHasValue = Object.prototype.hasOwnProperty.call(allValues, stepKey);
                     const stepValue = allValues[stepKey];
 
                     if (match) {
-                        return <div>Step {stepContents} [{stepValue || '<empty>'}] | <button
-                            type="button"
-                            onClick={() => currentOp.invoke({ ...allValues, [stepKey]: `answer for ${stepContents}` })}
-                        >NEXT</button></div>;
+                        return <div>
+                            Step {stepContents} [
+                            {stepHasValue ? stepValue : '<empty>'}
+                            ] | <button
+                                type="button"
+                                onClick={() => {
+                                    const updatedAllValues = {
+                                        ...allValues,
+                                        [stepKey]: `answer for ${stepContents}`
+                                    };
+
+                                    currentOp.invoke(updatedAllValues);
+                                }}
+                            >NEXT</button>
+                        </div>;
                     }
 
-                    if (!allValues.hasOwnProperty(stepKey)) {
+                    if (!stepHasValue) {
                         // stale navigation, redirect to start
-                        return <div><button type="button" onClick={() => history.push('/step1')}>Go to start</button></div>;
+                        return <button
+                            type="button"
+                            onClick={() => history.push('/')}
+                        >Go to start, nothing on /{stepKey}</button>;
                     }
 
                     return next(stepValue);
                 }}</Route>;
             }}
         >{function* () {
-            let step = 1;
+            const answer = yield [ '', `FIRST STEP` ];
 
-            while (step < 3) {
+            let step = 2;
+
+            while (step < 4) {
                 reportStepYield(step);
-
                 const answer = yield [ `step${step}`, `STEP ${step}` ];
-                reportStepAnswer(answer);
+                reportStepAnswer(step, answer);
 
                 step += 1;
             }
