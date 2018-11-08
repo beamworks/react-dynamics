@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, MemoryRouter } from 'react-router';
+import { Route, Redirect, MemoryRouter } from 'react-router';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 
@@ -54,12 +54,7 @@ storiesOf('Sequence', module)
                 return <Route refreshLocation={refreshLocation} exact path={`/${stepKey}`}>{({ match, location, history }) => {
                     // redirect to current step if previous one is done
                     if (previousStepComplete) {
-                        return <div>
-                            should redirect to /{stepKey}... <button
-                                type="button"
-                                onClick={() => history.push(`/${stepKey}`)}
-                            >Go</button>
-                        </div>;
+                        return <Redirect push to={`/${stepKey}`} />;
                     }
 
                     // final step never has a current value
