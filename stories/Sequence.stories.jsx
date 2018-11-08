@@ -70,19 +70,22 @@ storiesOf('Sequence', module)
 
                     if (match) {
                         // display current prompt
-                        return <Task>{(redirectState, startRedirect) => redirectState && stepHasValue ? next(stepValue, true) : <div>
+                        return <Task>{(redirectState, startRedirect) => redirectState ? next(redirectState.source, true) : <div>
                             Step {stepContents} [
                             {stepHasValue ? stepValue : '<empty>'}
                             ] | <button
                                 type="button"
                                 onClick={() => {
-                                    const updatedAllValues = {
-                                        ...allValues,
-                                        [stepKey]: `answer for ${stepContents}`
-                                    };
+                                    // start redirection right away
+                                    // (pass new step value directly to avoid state change timing issues)
+                                    const updatedStepValue = `answer for ${stepContents}`;
+                                    startRedirect(updatedStepValue);
 
-                                    currentOp.invoke(updatedAllValues);
-                                    startRedirect();
+                                    // store the step value for later re-renders
+                                    currentOp.invoke({
+                                        ...allValues,
+                                        [stepKey]: updatedStepValue
+                                    });
                                 }}
                             >NEXT</button>
                         </div>}</Task>;
