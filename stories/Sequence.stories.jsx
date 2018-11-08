@@ -48,7 +48,7 @@ storiesOf('Sequence', module)
         const reportStepAnswer = action('resulting answer');
 
         return <MemoryRouter><Route>{({ location: refreshLocation }) => <Op action={v => v}>{(currentOp, lastOp) => <Sequence
-            step={(prompt, next, prevStepActive) => {
+            step={(prompt, next, previousStepComplete) => {
                 if (!next) {
                     // @todo move this down? if it is meant to support paths
                     return <div>Finish {prompt}</div>;
@@ -62,6 +62,17 @@ storiesOf('Sequence', module)
                     const stepHasValue = Object.prototype.hasOwnProperty.call(allValues, stepKey);
                     const stepValue = allValues[stepKey];
 
+                    // redirect to current step if previous one is done
+                    if (previousStepComplete) {
+                        return <div>
+                            should redirect to /{stepKey}... <button
+                                type="button"
+                                onClick={() => history.push(`/${stepKey}`)}
+                            >Go</button>
+                        </div>;
+                    }
+
+                    // display current prompt
                     if (match) {
                         return <Task>{(redirectState, startRedirect) => redirectState && stepHasValue ? next(stepValue, true) : <div>
                             Step {stepContents} [
@@ -79,28 +90,24 @@ storiesOf('Sequence', module)
                                 }}
                             >NEXT</button>
                         </div>}</Task>;
-                    } else if (prevStepActive) {
-                        return <div>
-                            should redirect to /{stepKey}... <button
-                                type="button"
-                                onClick={() => history.push(`/${stepKey}`)}
-                            >Go</button>
-                        </div>;
                     }
 
+                    // stale navigation, redirect to start
                     if (!stepHasValue) {
-                        // stale navigation, redirect to start
                         return <button
                             type="button"
                             onClick={() => history.push('/')}
                         >Go to start, nothing on /{stepKey}</button>;
                     }
 
+                    // move on to next step
                     return next(stepValue, false);
                 }}</Route>;
             }}
         >{function* () {
-            const answer = yield [ '', `FIRST STEP` ];
+            reportStepYield('FIRST');
+            const firstAnswer = yield [ '', `FIRST STEP` ];
+            reportStepAnswer('FIRST', firstAnswer);
 
             let step = 2;
 
