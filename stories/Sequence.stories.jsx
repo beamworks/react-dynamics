@@ -48,14 +48,14 @@ storiesOf('Sequence', module)
         const reportStepAnswer = action('resulting answer');
 
         return <MemoryRouter><Route>{({ location: refreshLocation }) => <Op action={v => v}>{(currentOp, lastOp) => <Sequence
-            step={(prompt, next, previousStepComplete) => {
+            step={(prompt, next, previousBreadcrumbs) => {
                 const [ stepKey, stepContents ] = prompt;
 
                 return <Route refreshLocation={refreshLocation} exact path={`/${stepKey}`}>{({ match, location, history }) => {
                     // redirect to current step if previous one is done
-                    if (previousStepComplete) {
-                        return <Redirect push to={`/${stepKey}`} />;
-                    }
+                    //if (previousStepComplete) {
+                      //  return <Redirect push to={`/${stepKey}`} />;
+                    //}
 
                     // final step never has a current value
                     if (!next) {
@@ -67,6 +67,45 @@ storiesOf('Sequence', module)
 
                     const stepHasValue = Object.prototype.hasOwnProperty.call(allValues, stepKey);
                     const stepValue = allValues[stepKey];
+
+                    const breadcrumbs = (previousBreadcrumbs || []).concat([ [
+                        stepKey,
+                        <span>{stepContents} [{stepHasValue ? stepValue : '<empty>'}]</span>,
+                        match
+                    ] ]);
+
+                    // keep recursing while we can
+                    if (stepHasValue) {
+                        return next(stepValue, breadcrumbs);
+                    }
+
+                    // show the currently-matched step
+                    return <div>
+                        <div>{breadcrumbs.map(([ breadcrumbKey, breadcrumbContents, breadcrumbMatch ]) => <button
+                            key={breadcrumbKey}
+                            type="button"
+                            style={breadcrumbMatch && { fontWeight: 'bold' }}
+                            onClick={() => history.push(`/${breadcrumbKey}`)}
+                        >[{breadcrumbKey}]</button>)}</div>
+
+                        {breadcrumbs.map(([ breadcrumbKey, breadcrumbContents, breadcrumbMatch ]) => breadcrumbMatch && <div key={0}>
+                            Step {breadcrumbContents} | <button
+                                type="button"
+                                onClick={() => {
+                                    // start redirection right away
+                                    // (pass new step value directly to avoid state change timing issues)
+                                    const updatedStepValue = `answer for '${breadcrumbKey}'`;
+                                    //startRedirect(updatedStepValue);
+
+                                    // store the step value for later re-renders
+                                    currentOp.invoke({
+                                        ...allValues,
+                                        [breadcrumbKey]: updatedStepValue
+                                    });
+                                }}
+                            >NEXT</button>
+                        </div>)}
+                    </div>;
 
                     if (match) {
                         // display current prompt
