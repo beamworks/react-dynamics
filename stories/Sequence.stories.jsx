@@ -49,19 +49,9 @@ storiesOf('Sequence', module)
 
         return <MemoryRouter><Route>{({ location: refreshLocation }) => <Op action={v => v}>{(currentOp, lastOp) => <Sequence
             step={(prompt, next, previousStepComplete) => {
-                if (!next) {
-                    // @todo move this down? if it is meant to support paths
-                    return <div>Finish {prompt}</div>;
-                }
-
                 const [ stepKey, stepContents ] = prompt;
 
                 return <Route refreshLocation={refreshLocation} exact path={`/${stepKey}`}>{({ match, location, history }) => {
-                    const allValues = lastOp && !lastOp.isError && lastOp.value || {};
-
-                    const stepHasValue = Object.prototype.hasOwnProperty.call(allValues, stepKey);
-                    const stepValue = allValues[stepKey];
-
                     // redirect to current step if previous one is done
                     if (previousStepComplete) {
                         return <div>
@@ -72,8 +62,19 @@ storiesOf('Sequence', module)
                         </div>;
                     }
 
-                    // display current prompt
+                    // final step never has a current value
+                    if (!next) {
+                        return <div>Finish {stepContents}</div>;
+                    }
+
+                    // normal step with possible stored value
+                    const allValues = lastOp && !lastOp.isError && lastOp.value || {};
+
+                    const stepHasValue = Object.prototype.hasOwnProperty.call(allValues, stepKey);
+                    const stepValue = allValues[stepKey];
+
                     if (match) {
+                        // display current prompt
                         return <Task>{(redirectState, startRedirect) => redirectState && stepHasValue ? next(stepValue, true) : <div>
                             Step {stepContents} [
                             {stepHasValue ? stepValue : '<empty>'}
@@ -90,18 +91,16 @@ storiesOf('Sequence', module)
                                 }}
                             >NEXT</button>
                         </div>}</Task>;
-                    }
-
-                    // stale navigation, redirect to start
-                    if (!stepHasValue) {
+                    } else if (stepHasValue) {
+                        // recurse into next step
+                        return next(stepValue, false);
+                    } else {
+                        // stale navigation, redirect to start
                         return <button
                             type="button"
                             onClick={() => history.push('/')}
                         >Go to start, nothing on /{stepKey}</button>;
                     }
-
-                    // move on to next step
-                    return next(stepValue, false);
                 }}</Route>;
             }}
         >{function* () {
@@ -119,7 +118,7 @@ storiesOf('Sequence', module)
                 step += 1;
             }
 
-            reportStepYield(step);
-            return `FINAL STEP ${step}`;
+            reportStepYield('FINAL');
+            return [ 'final', `FINAL STEP ${step}` ];
         }}</Sequence>}</Op>}</Route></MemoryRouter>;
     });
