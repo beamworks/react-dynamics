@@ -8,8 +8,9 @@ storiesOf('Task', module)
     .add('simple dropdown toggle', () => {
         const reportStart = action('started task');
         const reportResolution = action('resolved task');
+        const reportRender = action('rendered with task state');
 
-        return <Task then={reportResolution}>{(taskState, activate) => <div>
+        return <Task then={reportResolution}>{(taskState, activate) => reportRender(!!taskState) || <div>
             <button type="button" onClick={() => {
                 activate();
                 reportStart();
