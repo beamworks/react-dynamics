@@ -47,9 +47,10 @@ storiesOf('Sequence', module)
         const reportStepYield = action('yielding on step');
         const reportStepAnswer = action('resulting answer');
 
-        return <MemoryRouter><Route>{({ location: refreshLocation }) => <Op action={v => v}>{(currentOp, lastOp) => <Sequence
+        return <MemoryRouter><Route>{({ location: refreshLocation }) => <Op action={v => v}>{(stashUpdateOp, currentStashOp) => <Sequence
             step={(prompt, next, previousBreadcrumbs) => {
                 const [ stepKey, stepContents ] = prompt;
+                const allValues = currentStashOp && !currentStashOp.isError && currentStashOp.value || {};
 
                 return <Route refreshLocation={refreshLocation} exact path={`/${stepKey}`}>{({ match, location, history }) => {
                     // redirect to current step if previous one is done
@@ -63,81 +64,70 @@ storiesOf('Sequence', module)
                     }
 
                     // normal step with possible stored value
-                    const allValues = lastOp && !lastOp.isError && lastOp.value || {};
+                    return <Task>{(doneStep, startNextStep) => {
+                        const stepHasValue = !!doneStep;
+                        const stepValue = doneStep ? doneStep.source : null;
 
-                    const stepHasValue = Object.prototype.hasOwnProperty.call(allValues, stepKey);
-                    const stepValue = allValues[stepKey];
+                        const breadcrumbs = (previousBreadcrumbs || []).concat([
+                            match
+                                ? [ stepKey, stepContents, startNextStep, doneStep ]
+                                : [ stepKey ]
+                        ]);
 
-                    const breadcrumbs = (previousBreadcrumbs || []).concat([ [
-                        stepKey,
-                        <span>{stepContents} [{stepHasValue ? stepValue : '<empty>'}]</span>,
-                        match
-                    ] ]);
+                        // keep recursing while we can
+                        if (doneStep) {
+                            return next(doneStep.source, breadcrumbs);
+                        }
 
-                    // keep recursing while we can
-                    if (stepHasValue) {
-                        return next(stepValue, breadcrumbs);
-                    }
+                        // reached end of the line, show the currently-matched step
+                        const currentBreadcrumb = breadcrumbs.find(([ breadcrumbKey, breadcrumbContents ]) => {
+                            return breadcrumbContents;
+                        });
 
-                    // show the currently-matched step
-                    return <div>
-                        <div>{breadcrumbs.map(([ breadcrumbKey, breadcrumbContents, breadcrumbMatch ]) => <button
-                            key={breadcrumbKey}
-                            type="button"
-                            style={breadcrumbMatch && { fontWeight: 'bold' }}
-                            onClick={() => history.push(`/${breadcrumbKey}`)}
-                        >[{breadcrumbKey}]</button>)}</div>
-
-                        {breadcrumbs.map(([ breadcrumbKey, breadcrumbContents, breadcrumbMatch ]) => breadcrumbMatch && <div key={0}>
-                            Step {breadcrumbContents} | <button
+                        // if stale navigation, redirect to start
+                        if (!currentBreadcrumb) {
+                            return <button
                                 type="button"
-                                onClick={() => {
-                                    // start redirection right away
-                                    // (pass new step value directly to avoid state change timing issues)
-                                    const updatedStepValue = `answer for '${breadcrumbKey}'`;
-                                    //startRedirect(updatedStepValue);
+                                onClick={() => history.push('/')}
+                            >Go to start, nothing on /{stepKey}</button>;
+                        }
 
-                                    // store the step value for later re-renders
-                                    currentOp.invoke({
-                                        ...allValues,
-                                        [breadcrumbKey]: updatedStepValue
-                                    });
-                                }}
-                            >NEXT</button>
-                        </div>)}
-                    </div>;
+                        const [ currentKey, currentContents, currentActivate, currentState ] = currentBreadcrumb;
 
-                    if (match) {
-                        // display current prompt
-                        return <Task>{(redirectState, startRedirect) => redirectState ? next(redirectState.source, true) : <div>
-                            Step {stepContents} [
-                            {stepHasValue ? stepValue : '<empty>'}
-                            ] | <button
+                        return <div>
+                            <div>{breadcrumbs.map(([ breadcrumbKey, breadcrumbContents, breadcrumbMatch ]) => <button
+                                key={breadcrumbKey}
                                 type="button"
-                                onClick={() => {
-                                    // start redirection right away
-                                    // (pass new step value directly to avoid state change timing issues)
-                                    const updatedStepValue = `answer for ${stepContents}`;
-                                    startRedirect(updatedStepValue);
+                                style={breadcrumbMatch && { fontWeight: 'bold' }}
+                                onClick={() => history.push(`/${breadcrumbKey}`)}
+                            >[{breadcrumbKey}]</button>)}</div>
 
-                                    // store the step value for later re-renders
-                                    currentOp.invoke({
-                                        ...allValues,
-                                        [stepKey]: updatedStepValue
-                                    });
-                                }}
-                            >NEXT</button>
-                        </div>}</Task>;
-                    } else if (stepHasValue) {
-                        // recurse into next step
-                        return next(stepValue, false);
-                    } else {
-                        // stale navigation, redirect to start
-                        return <button
-                            type="button"
-                            onClick={() => history.push('/')}
-                        >Go to start, nothing on /{stepKey}</button>;
-                    }
+                            <div>
+                                Step <span>{currentContents} [{currentState ? currentState.source : '<empty>'}]</span> | <button
+                                    type="button"
+                                    onClick={() => {
+                                        // start redirection right away
+                                        // (pass new step value directly to avoid state change timing issues)
+                                        const updatedStepValue = `answer for '${currentKey}'`;
+
+                                        if (currentState) {
+                                            currentState.cancel();
+                                        }
+
+                                        currentActivate(updatedStepValue);
+
+                                        // store the step value for later re-renders
+                                        //stashUpdateOp.invoke({
+                                        //    ...allValues,
+                                        //    [currentKey]: updatedStepValue
+                                        //});
+                                        //<Task>{(redirectState, startRedirect) => redirectState ? next(redirectState.source, true) : }</Task>
+
+                                    }}
+                                >NEXT</button>
+                            </div>
+                        </div>;
+                    }}</Task>;
                 }}</Route>;
             }}
         >{function* () {
