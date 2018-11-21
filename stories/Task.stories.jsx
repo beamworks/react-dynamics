@@ -27,4 +27,25 @@ storiesOf('Task', module)
                 : <div><i>(inactive)</i></div>
             }
         </div>}</Task>;
+    })
+    .add('combined task cascade resolve', () => {
+        const reportResolutionStart = action('start resolving inner task');
+        const reportInnerResolution = action('resolved inner task');
+        const reportOuterResolution = action('resolved outer task');
+        const reportRender = action('rendered with outer/inner task states');
+
+        return <Task then={reportOuterResolution}>{(outerTaskState, outerActivate) =>
+            <Task then={(value) => {
+                reportInnerResolution(value);
+                outerTaskState.resolve(value);
+            }}>{(taskState, activate) => reportRender(!!outerTaskState, !!taskState) || <div>
+                {outerTaskState ? (taskState
+                    ? <button type="button" onClick={() => {
+                        reportResolutionStart();
+                        taskState.resolve(new Date());
+                    }}>Resolve Inner</button>
+                    : <button type="button" onClick={activate}>Activate Inner</button>
+                ) : <button type="button" onClick={outerActivate}>Activate Outer</button>}
+            </div>}</Task>
+        }</Task>
     });
