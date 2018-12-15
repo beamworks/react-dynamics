@@ -40,4 +40,44 @@ storiesOf('Sequence', module)
             reportStepYield(step);
             return `FINAL STEP ${step}`;
         }}</Sequence>;
+    })
+    .add('testing nested component reconciliation', () => {
+        const reportStepYield = action('yielding on step');
+        const reportStepAnswer = action('resulting answer');
+        const reportNodeRef = action('step ref');
+
+        return <Sequence
+            step={(prompt, next) => {
+                if (!next) {
+                    return <div>{prompt}</div>;
+                }
+
+                return <Task>{(doneStep, startNextStep) =>
+                    !doneStep
+                        ? <div>
+                            {prompt}
+                            {' '}
+                            <button
+                                type="button"
+                                onClick={() => startNextStep(`answer ${new Date()}`)}
+                            >NEXT</button>
+                        </div>
+                        : next(doneStep.source)
+                }</Task>;
+            }}
+        >{function* () {
+            let step = 1;
+
+            while (step < 3) {
+                reportStepYield(step);
+
+                const answer = yield <span ref={reportNodeRef}>{`STEP ${step}`}</span>;
+                reportStepAnswer(answer);
+
+                step += 1;
+            }
+
+            reportStepYield(step);
+            return <span ref={reportNodeRef}>{`FINAL STEP ${step}`}</span>;
+        }}</Sequence>;
     });
