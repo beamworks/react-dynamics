@@ -10,7 +10,7 @@ storiesOf('Task', module)
         const reportResolution = action('resolved task');
         const reportRender = action('rendered with task state');
 
-        return <Task then={reportResolution}>{(taskState, activate) => reportRender(!!taskState) || <div>
+        return <Task onComplete={reportResolution}>{(taskState, activate) => reportRender(!!taskState) || <div>
             <button type="button" onClick={() => {
                 activate();
                 reportStart();
@@ -34,8 +34,8 @@ storiesOf('Task', module)
         const reportOuterResolution = action('resolved outer task');
         const reportRender = action('rendered with outer/inner task states');
 
-        return <Task then={reportOuterResolution}>{(outerTaskState, outerActivate) =>
-            <Task then={(value) => {
+        return <Task onComplete={reportOuterResolution}>{(outerTaskState, outerActivate) =>
+            <Task onComplete={(value) => {
                 reportInnerResolution(value);
                 outerTaskState.resolve(value);
             }}>{(taskState, activate) => reportRender(!!outerTaskState, !!taskState) || <div>
@@ -48,4 +48,32 @@ storiesOf('Task', module)
                 ) : <button type="button" onClick={outerActivate}>Activate Outer</button>}
             </div>}</Task>
         }</Task>
+    })
+    .add('ref-based task activation', () => {
+        const reportActivation = action('activating task via ref');
+        const reportResolution = action('task resolved');
+
+        let taskInstance = null
+
+        return <div>
+            <button type="button" onClick={() => {
+                reportActivation();
+                taskInstance.activate(new Date());
+            }}>Activate Via Ref</button>
+
+            <hr />
+
+            <Task onComplete={() => reportResolution()} ref={node => taskInstance = node}>
+                {(taskState) =>
+                    <div>
+                        {taskState
+                            ? <button type="button" onClick={() => {
+                                taskState.resolve();
+                            }}>Resolve ({taskState.source.toString()})</button>
+                            : <i>(inactive)</i>
+                        }
+                    </div>
+                }
+            </Task>
+        </div>
     });

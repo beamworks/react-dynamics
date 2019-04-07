@@ -7,7 +7,7 @@ import Op from '!babel-loader!../lib/Op';
 storiesOf('Op', module)
     .add('basic usage (synchronous)', () => {
         const reportAction = action('op action called with input');
-        const reportThen = action('op then-prop called');
+        const reportCompletion = action('op onComplete called');
         const reportRenderWithoutLastOp = action('render without lastOp');
         const reportRenderWithLastOp = action('render with lastOp');
 
@@ -16,7 +16,7 @@ storiesOf('Op', module)
                 reportAction(value);
                 return `output for ${value}`;
             }}
-            then={reportThen}
+            onComplete={reportCompletion}
         >{(currentOp, lastOp) => {
             if (lastOp) {
                 reportRenderWithLastOp(lastOp.value);

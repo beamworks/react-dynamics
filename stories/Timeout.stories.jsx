@@ -8,13 +8,13 @@ storiesOf('Timeout', module)
     .add('basic usage', () => {
         const reportOuterRender = action('render parent');
         const reportRender = action('render with timeout state');
-        const reportFinish = action('timeout then-prop call');
+        const reportFinish = action('timeout onComplete call');
 
         reportOuterRender();
 
         return <div>
             <span>Timeout (500ms): </span>
-            <Timeout on delayMs={500} then={() => {
+            <Timeout on delayMs={500} onComplete={() => {
                 reportFinish();
             }}>{timeoutState => {
                 reportRender(timeoutState);
@@ -28,7 +28,7 @@ storiesOf('Timeout', module)
     .add('with mid-way reset', () => {
         const reportOuterRender = action('render parent');
         const reportRender = action('render with timeout state');
-        const reportFinish = action('timeout then-prop call');
+        const reportFinish = action('timeout onComplete call');
 
         reportOuterRender();
 
@@ -36,7 +36,7 @@ storiesOf('Timeout', module)
             <span>Timeout (500ms): </span>
             <Timeout on delayMs={500}>{outerTimeoutState => {
                 // interrupt the first timeout via the on-prop
-                return <Timeout on={outerTimeoutState ? 'first' : 'second'} delayMs={1000} then={() => {
+                return <Timeout on={outerTimeoutState ? 'first' : 'second'} delayMs={1000} onComplete={() => {
                     reportFinish();
                 }}>{timeoutState => {
                     reportRender(timeoutState);
