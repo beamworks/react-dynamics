@@ -48,4 +48,32 @@ storiesOf('Task', module)
                 ) : <button type="button" onClick={outerActivate}>Activate Outer</button>}
             </div>}</Task>
         }</Task>
+    })
+    .add('ref-based task activation', () => {
+        const reportActivation = action('activating task via ref');
+        const reportResolution = action('task resolved');
+
+        let taskInstance = null
+
+        return <div>
+            <button type="button" onClick={() => {
+                reportActivation();
+                taskInstance.activate(new Date());
+            }}>Activate Via Ref</button>
+
+            <hr />
+
+            <Task then={() => reportResolution()} ref={node => taskInstance = node}>
+                {(taskState) =>
+                    <div>
+                        {taskState
+                            ? <button type="button" onClick={() => {
+                                taskState.resolve();
+                            }}>Resolve ({taskState.source.toString()})</button>
+                            : <i>(inactive)</i>
+                        }
+                    </div>
+                }
+            </Task>
+        </div>
     });
