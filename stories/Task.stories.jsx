@@ -10,7 +10,7 @@ storiesOf('Task', module)
         const reportResolution = action('resolved task');
         const reportRender = action('rendered with task state');
 
-        return <Task then={reportResolution}>{(taskState, activate) => reportRender(!!taskState) || <div>
+        return <Task onComplete={reportResolution}>{(taskState, activate) => reportRender(!!taskState) || <div>
             <button type="button" onClick={() => {
                 activate();
                 reportStart();
@@ -34,8 +34,8 @@ storiesOf('Task', module)
         const reportOuterResolution = action('resolved outer task');
         const reportRender = action('rendered with outer/inner task states');
 
-        return <Task then={reportOuterResolution}>{(outerTaskState, outerActivate) =>
-            <Task then={(value) => {
+        return <Task onComplete={reportOuterResolution}>{(outerTaskState, outerActivate) =>
+            <Task onComplete={(value) => {
                 reportInnerResolution(value);
                 outerTaskState.resolve(value);
             }}>{(taskState, activate) => reportRender(!!outerTaskState, !!taskState) || <div>
@@ -63,7 +63,7 @@ storiesOf('Task', module)
 
             <hr />
 
-            <Task then={() => reportResolution()} ref={node => taskInstance = node}>
+            <Task onComplete={() => reportResolution()} ref={node => taskInstance = node}>
                 {(taskState) =>
                     <div>
                         {taskState
