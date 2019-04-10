@@ -12,7 +12,7 @@ storiesOf('Task', module)
 
         return <Task onComplete={reportResolution}>{(taskState, activate) => reportRender(!!taskState) || <div>
             <button type="button" onClick={() => {
-                activate();
+                activate(new Date());
                 reportStart();
             }}>Activate</button>
 
