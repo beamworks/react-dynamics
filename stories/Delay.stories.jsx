@@ -42,7 +42,7 @@ storiesOf('Delay', module)
                     reportRender(timeoutState);
 
                     return timeoutState
-                        ? '...waiting for ' + timeoutState.source
+                        ? '...waiting for ' + timeoutState.key
                         : 'finished!';
                 }}</Delay>;
             }}</Delay>
