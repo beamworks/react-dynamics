@@ -2,9 +2,9 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 
-import Timeout from '!babel-loader!../lib/Timeout';
+import Delay from '!babel-loader!../lib/Delay';
 
-storiesOf('Timeout', module)
+storiesOf('Delay', module)
     .add('basic usage', () => {
         const reportOuterRender = action('render parent');
         const reportRender = action('render with timeout state');
@@ -13,8 +13,8 @@ storiesOf('Timeout', module)
         reportOuterRender();
 
         return <div>
-            <span>Timeout (500ms): </span>
-            <Timeout on delayMs={500} onComplete={() => {
+            <span>Delay (500ms): </span>
+            <Delay on delayMs={500} onComplete={() => {
                 reportFinish();
             }}>{timeoutState => {
                 reportRender(timeoutState);
@@ -22,7 +22,7 @@ storiesOf('Timeout', module)
                 return timeoutState
                     ? '...waiting'
                     : 'finished!';
-            }}</Timeout>
+            }}</Delay>
         </div>;
     })
     .add('with mid-way reset', () => {
@@ -33,10 +33,10 @@ storiesOf('Timeout', module)
         reportOuterRender();
 
         return <div>
-            <span>Timeout (500ms): </span>
-            <Timeout on delayMs={500}>{outerTimeoutState => {
+            <span>Delay (500ms): </span>
+            <Delay on delayMs={500}>{outerTimeoutState => {
                 // interrupt the first timeout via the on-prop
-                return <Timeout on={outerTimeoutState ? 'first' : 'second'} delayMs={1000} onComplete={() => {
+                return <Delay on={outerTimeoutState ? 'first' : 'second'} delayMs={1000} onComplete={() => {
                     reportFinish();
                 }}>{timeoutState => {
                     reportRender(timeoutState);
@@ -44,7 +44,7 @@ storiesOf('Timeout', module)
                     return timeoutState
                         ? '...waiting for ' + timeoutState.source
                         : 'finished!';
-                }}</Timeout>;
-            }}</Timeout>
+                }}</Delay>;
+            }}</Delay>
         </div>;
     });
