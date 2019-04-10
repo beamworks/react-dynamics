@@ -10,9 +10,9 @@ storiesOf('Task', module)
         const reportResolution = action('resolved task');
         const reportRender = action('rendered with task state');
 
-        return <Task onComplete={reportResolution}>{(taskState, activate) => reportRender(!!taskState) || <div>
+        return <Task onComplete={reportResolution}>{(taskState, activate) => reportRender(taskState && taskState.source) || <div>
             <button type="button" onClick={() => {
-                activate();
+                activate(new Date());
                 reportStart();
             }}>Activate</button>
 
