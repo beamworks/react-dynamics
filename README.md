@@ -13,17 +13,12 @@ Approach:
 - extra care to avoid timing bugs
 - composition using [function-as-child](https://medium.com/merrickchristensen/function-as-child-components-5f3920a9ace9) technique
 
-Core areas:
+Core elements:
 
-- DOM interaction affordances
-    - `Focusable`: track DOM focus state for an element and all of its children
-    - `Hoverable`: track DOM mouse hover status
-    - `Pressable`: track mouse click and touch status for gestures and dragging
-- abstract interaction state
-    - `Data`: request data on demand and asynchronously wait for result
-    - `Op`: trigger long-running action and report its results to the user
-    - `Task`: status tracker started and stopped via user events (for e.g. dropdowns, popups)
-    - `Timeout`: basic timeout state triggered via prop
+- `Data`: request data on demand and asynchronously wait for result
+- `Op`: trigger long-running action and report its results to the user
+- `Task`: status tracker started and stopped via user events (for e.g. dropdowns, popups)
+- `Delay`: basic timeout state triggered via prop
 
 ## Op Usage
 
@@ -32,7 +27,7 @@ Simple usage example of the `Op` component:
 ```
 <Op
     action={() => doSomethingReturningPromise()}
-    then={result => doSomethingElseUnlessAlreadyUnmounted(result)}
+    onComplete={result => doSomethingElseUnlessAlreadyUnmounted(result)}
 >
     {(currentOp, lastOp) =>
         <form onSubmit={() => currentOp.invoke()} action="javascript:void(0)">
