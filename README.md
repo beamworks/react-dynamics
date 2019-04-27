@@ -32,7 +32,7 @@ Simple usage example of the `Op` component:
     {(currentOp, lastOp) =>
         <form onSubmit={() => currentOp.invoke()} action="javascript:void(0)">
             {lastOp && lastOp.isError
-                ? <var>Please try again! Error: {lastOp.value}</var>
+                ? <var>Please try again! Error: {lastOp.error}</var>
                 : null
             }
 
