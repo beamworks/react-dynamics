@@ -1,2 +1,5 @@
 /node_modules
 /.cache
+
+# dev-only package lock
+/package-lock.json
