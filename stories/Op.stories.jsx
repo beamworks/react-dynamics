@@ -17,16 +17,16 @@ storiesOf('Op', module)
                 return `output for ${value}`;
             }}
             onComplete={reportCompletion}
-        >{(currentOp, lastOp) => {
+        >{(invoke, isPending, lastOp) => {
             if (lastOp) {
-                reportRenderWithLastOp(lastOp.value);
+                reportRenderWithLastOp(lastOp);
             } else {
                 reportRenderWithoutLastOp();
             }
 
             return <div>
-                <button type="button" onClick={() => currentOp.invoke('TEST' + currentOp.key)}>
-                    Invoke with: TEST{currentOp.key}
+                <button type="button" onClick={() => invoke(new Date())}>
+                    Invoke
                 </button>
             </div>;
         }}</Op>;
@@ -39,17 +39,17 @@ storiesOf('Op', module)
         const reportRenderWithLastOp = action('render with lastOp');
 
         return <Op
-            autoInvoke={() => Promise.resolve(new Date())}
+            autoInvoke={() => new Date()}
             action={value => {
                 reportAction(value);
                 return `output for ${value}`;
             }}
             onComplete={reportCompletion}
-        >{(currentOp, lastOp) => {
-            if (currentOp.isPending) {
+        >{(invoke, isPending, lastOp) => {
+            if (isPending) {
                 reportRenderPending();
             } else if (lastOp) {
-                reportRenderWithLastOp(lastOp.value);
+                reportRenderWithLastOp(lastOp);
             } else {
                 // this should never fire
                 reportRenderWithoutLastOp();
