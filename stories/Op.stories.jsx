@@ -30,4 +30,33 @@ storiesOf('Op', module)
                 </button>
             </div>;
         }}</Op>;
+    })
+    .add('immediate (autorun) invocation', () => {
+        const reportAction = action('op action called with input');
+        const reportCompletion = action('op onComplete called');
+        const reportRenderPending = action('render pending state');
+        const reportRenderWithoutLastOp = action('render without lastOp');
+        const reportRenderWithLastOp = action('render with lastOp');
+
+        return <Op
+            autoInvoke={() => Promise.resolve(new Date())}
+            action={value => {
+                reportAction(value);
+                return `output for ${value}`;
+            }}
+            onComplete={reportCompletion}
+        >{(currentOp, lastOp) => {
+            if (currentOp.isPending) {
+                reportRenderPending();
+            } else if (lastOp) {
+                reportRenderWithLastOp(lastOp.value);
+            } else {
+                // this should never fire
+                reportRenderWithoutLastOp();
+            }
+
+            return <div>
+                <i>(auto-invoked)</i>
+            </div>;
+        }}</Op>;
     });
