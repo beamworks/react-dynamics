@@ -28,6 +28,40 @@ storiesOf('Task', module)
             }
         </div>}</Task>;
     })
+    .add('interrupted via disabled-prop', () => {
+        const reportStart = action('started task');
+        const reportResolution = action('resolved task');
+        const reportRender = action('rendered with task state');
+
+        return <Task>{(outerTaskState, outerActivate) =>
+            <Task disabled={!!outerTaskState} onComplete={reportResolution}>
+                {(taskState, activate) => reportRender(!!taskState) || <div>
+                    <button type="button" onClick={() => {
+                        activate();
+                        reportStart();
+                    }}>Activate Task</button>
+
+                    <hr />
+
+                    {taskState
+                        ? <div style={{ display: 'inline-block', padding: '10px', background: '#f0f0f0' }}>
+                            Task active: {''}
+                            <button type="button" onClick={() => taskState.resolve(new Date())}>Resolve</button>
+                            <button type="button" onClick={() => taskState.cancel()}>Cancel</button>
+                        </div>
+                        : <div><i>(inactive)</i>, <i>({outerTaskState ? 'disabled' : 'enabled'})</i></div>
+                    }
+
+                    <hr />
+
+                    {outerTaskState
+                        ? <button type="button" onClick={() => outerTaskState.cancel()}>Enable</button>
+                        : <button type="button" onClick={() => outerActivate()}>Disable</button>
+                    }
+                </div>}
+            </Task>
+        }</Task>
+    })
     .add('combined task cascade resolve', () => {
         const reportResolutionStart = action('start resolving inner task');
         const reportInnerResolution = action('resolved inner task');
