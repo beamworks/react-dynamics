@@ -36,6 +36,7 @@ storiesOf('Op', module)
     })
     .add('error reporting', () => {
         const reportAction = action('op action called with input');
+        const reportError = action('op onError called');
         const reportRenderWithoutLastOp = action('render without lastOp');
         const reportRenderPending = action('render pending state');
         const reportRenderWithLastOp = action('render with lastOp');
@@ -45,6 +46,7 @@ storiesOf('Op', module)
                 reportAction(value);
                 throw new Error(`error for ${value}`);
             }}
+            onError={reportError}
         >{(invoke, isPending, lastOp) => {
             if (isPending) {
                 reportRenderPending();
