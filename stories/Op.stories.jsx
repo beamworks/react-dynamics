@@ -9,6 +9,7 @@ storiesOf('Op', module)
         const reportAction = action('op action called with input');
         const reportCompletion = action('op onComplete called');
         const reportRenderWithoutLastOp = action('render without lastOp');
+        const reportRenderPending = action('render pending state');
         const reportRenderWithLastOp = action('render with lastOp');
 
         return <Op
@@ -18,10 +19,39 @@ storiesOf('Op', module)
             }}
             onComplete={reportCompletion}
         >{(invoke, isPending, lastOp) => {
-            if (lastOp) {
-                reportRenderWithLastOp(lastOp);
-            } else {
+            if (isPending) {
+                reportRenderPending();
+            } else if (!lastOp) {
                 reportRenderWithoutLastOp();
+            } else {
+                reportRenderWithLastOp(lastOp);
+            }
+
+            return <div>
+                <button type="button" onClick={() => invoke(new Date())}>
+                    Invoke
+                </button>
+            </div>;
+        }}</Op>;
+    })
+    .add('error reporting', () => {
+        const reportAction = action('op action called with input');
+        const reportRenderWithoutLastOp = action('render without lastOp');
+        const reportRenderPending = action('render pending state');
+        const reportRenderWithLastOp = action('render with lastOp');
+
+        return <Op
+            action={value => {
+                reportAction(value);
+                throw new Error(`error for ${value}`);
+            }}
+        >{(invoke, isPending, lastOp) => {
+            if (isPending) {
+                reportRenderPending();
+            } else if (!lastOp) {
+                reportRenderWithoutLastOp();
+            } else {
+                reportRenderWithLastOp(lastOp, lastOp.error.message);
             }
 
             return <div>
