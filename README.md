@@ -29,18 +29,18 @@ Simple usage example of the `Op` component:
     action={() => doSomethingReturningPromise()}
     onComplete={result => doSomethingElseUnlessAlreadyUnmounted(result)}
 >
-    {(currentOp, lastOp) =>
-        <form onSubmit={() => currentOp.invoke()} action="javascript:void(0)">
+    {(invoke, isPending, lastOp) =>
+        <form onSubmit={() => invoke()} action="javascript:void(0)">
             {lastOp && lastOp.isError
                 ? <var>Please try again! Error: {lastOp.error}</var>
                 : null
             }
 
-            {currentOp.isPending ? <Spinner/> : null}
+            {isPending ? <Spinner/> : null}
 
             ... input elements, etc ...
 
-            <button type="submit" disabled={currentOp.isPending}>Submit</button>
+            <button type="submit" disabled={isPending}>Submit</button>
         </form>
     }
 </Op>
